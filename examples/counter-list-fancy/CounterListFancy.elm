@@ -75,7 +75,15 @@ viewCounter address ( id, model ) =
   let
     context =
       Counter.Context
+        -- Counter.viewWithRemoveButton takes a Counter.action not a CounterListFancy.action
+        -- Signal.forwardTo takes an address of CLFAction and a function to convert CActions to
+        -- CLF actions, which is the partial application of modify id
         (Signal.forwardTo address (Modify id))
+        -- always (Remove id) -> (b -> (Remove id))
+        -- forwardTo wants CA -> CLFA
+        -- forwardTo disregards the CA because of always
+        -- forwardTo gets CLF Action Address, and ignores any data from CA , instead sending
+        -- Remove id to update
         (Signal.forwardTo address (always (Remove id)))
   in
     Counter.viewWithRemoveButton context model
