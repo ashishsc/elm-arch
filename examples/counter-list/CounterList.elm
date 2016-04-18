@@ -87,6 +87,7 @@ viewCounter address ( id, model ) =
   -}
   let
     modifyAddress =
+      --                       V CA -> CLA
       Signal.forwardTo address (Modify id)
   in
     Counter.view modifyAddress model
