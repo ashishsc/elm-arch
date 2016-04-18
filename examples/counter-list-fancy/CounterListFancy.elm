@@ -40,7 +40,7 @@ update action model =
   case action of
     Insert ->
       { model
-        | counters = (model.nextID Counter.init 0) :: model.counters
+        | counters = ( model.nextID, Counter.init 0 ) :: model.counters
         , nextID = model.nextID + 1
       }
 
@@ -59,3 +59,23 @@ update action model =
             ( counterId, counterModel )
       in
         { model | counters = List.map updateCounter model.counters }
+
+
+view : Signal.Address Action -> Model -> Html
+view address model =
+  let
+    insert =
+      button [ onClick address Insert ] [ text "Add" ]
+  in
+    div [] (insert :: List.map (viewCounter address) model.counters)
+
+
+viewCounter : Signal.Address Action -> ( ID, Counter.Model ) -> Html
+viewCounter address ( id, model ) =
+  let
+    context =
+      Counter.Context
+        (Signal.forwardTo address (Modify id))
+        (Signal.forwardTo address (always (Remove id)))
+  in
+    Counter.viewWithRemoveButton context model
