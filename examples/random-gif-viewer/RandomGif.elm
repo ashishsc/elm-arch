@@ -2,8 +2,8 @@ module RandomGif (init, update, view) where
 
 import Effects exposing (Effects, Never)
 import Html exposing (..)
-import Html.Attributes exposing (style)
-import Html.Events exposing (onClick)
+import Html.Attributes exposing (..)
+import Html.Events exposing (onClick, on, targetValue)
 import Http
 import Json.Decode as Json
 import Task
@@ -83,6 +83,7 @@ decodeImageUrl =
 type Action
   = RequestMore
   | NewGif (Maybe String)
+  | NewTopic String
 
 
 update : Action -> Model -> ( Model, Effects Action )
@@ -96,6 +97,11 @@ update msg model =
       , Effects.none
       )
 
+    NewTopic topic' ->
+      ( { model | topic = topic' }
+      , Effects.none
+      )
+
 
 
 -- VIEW
@@ -103,12 +109,22 @@ update msg model =
 
 view : Signal.Address Action -> Model -> Html
 view address model =
-  div
-    [ style [ "width" => "200px" ] ]
-    [ h2 [ headerStyle ] [ text model.topic ]
-    , div [ imgStyle model.gifUrl ] []
-    , button [ onClick address RequestMore ] [ text "More Please!" ]
-    ]
+  let
+    stringAddress =
+      Signal.forwardTo address NewTopic
+  in
+    div
+      [ style [ "width" => "200px" ] ]
+      [ h2 [ headerStyle ] [ text model.topic ]
+      , div [ imgStyle model.gifUrl ] []
+      , button [ onClick address RequestMore ] [ text "More Please!" ]
+      , input
+          [ placeholder "new topic"
+          , value model.topic
+          , on "input" targetValue (Signal.message stringAddress)
+          ]
+          []
+      ]
 
 
 
