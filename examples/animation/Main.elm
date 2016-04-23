@@ -5,7 +5,7 @@ import Effects exposing (Never)
 
 --import SpinSquarePair exposing (init, update, view)
 
-import SpinSquare exposing (init, update, view)
+import SpinSquarePair exposing (init, update, view)
 import StartApp
 import Task
 
