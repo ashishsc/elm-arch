@@ -88,6 +88,46 @@ update msg model =
           )
 
 
+
+-- VIEW
+
+
+{-| Returns an offset angle
+-}
+toOffset : AnimationState -> Float
+toOffset animationState =
+  case animationState of
+    Nothing ->
+      0
+
+    Just { elapsedTime } ->
+      -- ease takes a type of easing, interpolation fn, from, to, duration,
+      -- and elapsed time
+      ease easeOutBounce float 0 rotateStep duration elapsedTime
+
+
 view : Signal.Address Action -> Model -> Html
 view address model =
-  Html.div [] []
+  let
+    angle =
+      model.angle + toOffset model.animationState
+  in
+    svg
+      [ width "200", height "200", viewBox "0 0 200 200" ]
+      [ g
+          [ transform ("translate(100,100) rotate(" ++ toString angle ++ ")")
+          , onClick (Signal.message address Spin)
+          ]
+          [ rect
+              [ x "-50"
+              , y "-50"
+              , width "100"
+              , height "100"
+              , rx "15"
+              , ry "15"
+              , style "fill :#60B5CC;"
+              ]
+              []
+          , text' [ fill "white", textAnchor "middle" ] [ text "Click me!" ]
+          ]
+      ]
